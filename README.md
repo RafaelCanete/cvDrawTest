@@ -1,11 +1,11 @@
-## cvDrawTest 
+# cvDrawTest 
 
-# Dependencies
+## Dependencies
 mediapipe
 opencv
 cvzone
 
-# How to run
+## How to run
 1. Create Python venv in project folder
 - python3 -m venv your-venv-name
 2. Go into venv 
