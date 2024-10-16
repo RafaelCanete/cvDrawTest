@@ -7,18 +7,20 @@ width, height = 1280, 720
 annotations = [[]]
 annotationNumber = -1
 annotationStart = False
-# gestureThreshold = 300
 
-
+# frame skipper for delete last annot debounce
+frame_skip = 4
+frame_counter = 0
 
 # HandDetector
-
 detector = HandDetector(detectionCon= 0.8, maxHands= 1) # Bei 80% Conf. wird eine Hand als Hand gekennzeichnet, Maximale Anzahl and Händen auf 1 gesetzt
 
 # Camera Setup
 cap = cv2.VideoCapture(0)
 cap.set(3, width)
 cap.set(4, height)
+cv2.setUseOptimized(True)
+
 
 while True:
     success, img = cap.read()
@@ -26,6 +28,8 @@ while True:
 
     hands, img = detector.findHands(img) # flipType = False, damit auch bei horizontaler Spiegelung der HD right und left richtig anzeigt
      # cv2.line(img, (0, gestureThreshold), (width, gestureThreshold), (0, 255, 0), 1)
+    frame_counter += 1
+
 
     if hands:
         hand = hands[0] # [0] weil wir nur eine Hand erlaubt haben
@@ -34,7 +38,7 @@ while True:
         lmList = hand["lmList"]
         indexFinger = lmList[8][0], lmList[8][1]
 
-
+        print(fingers)
 
         if fingers == [0,1,1,0,0]: # create pointer index, middlefinger up
             cv2.circle(img, indexFinger, 12, (0,0,255), cv2.FILLED)
@@ -49,10 +53,16 @@ while True:
         else:
             annotationStart = False
 
-        if fingers == [1,1,1,1,1]:
+        if fingers == [1,1,1,1,1]: # reset drawing
             annotations = [[]]
             annotationNumber = -1
             annotationStart = False
+
+        if fingers == [0, 1, 1, 1, 0] and frame_counter % frame_skip == 0:
+            if annotations:
+                annotations.pop(-1)
+                annotationNumber -= 1
+                annotationStart = False
             
 
     for i in range(len(annotations)):
