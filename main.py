@@ -7,9 +7,10 @@ width, height = 1280, 720
 annotations = [[]]
 annotationNumber = -1
 annotationStart = False
+lastDel = False
 
 # frame skipper for delete last annot debounce
-frame_skip = 4
+frame_skip = 6
 frame_counter = 0
 
 # HandDetector
@@ -38,31 +39,37 @@ while True:
         lmList = hand["lmList"]
         indexFinger = lmList[8][0], lmList[8][1]
 
-        print(fingers)
-
         if fingers == [0,1,1,0,0]: # create pointer index, middlefinger up
             cv2.circle(img, indexFinger, 12, (0,0,255), cv2.FILLED)
+            annotationStart = False
     
         if fingers == [0,1,0,0,0]: # Draw pointer
             if annotationStart is False:
-                annotationStart = True
                 annotationNumber += 1
+                if lastDel is True:
+                    annotationNumber += 1
+                    annotations.append([])
+                    lastDel = False
                 annotations.append([])
-            cv2.circle(img, indexFinger, 12, (0,0,255), cv2.FILLED)
+                annotationStart = True
+                print("if is exec")
+            cv2.circle(img, indexFinger, 8, (0,0,255), cv2.FILLED)
             annotations[annotationNumber].append(indexFinger)
+            print("is drawing")
         else:
             annotationStart = False
 
         if fingers == [1,1,1,1,1]: # reset drawing
             annotations = [[]]
-            annotationNumber = -1
+            annotationNumber =  -1
             annotationStart = False
 
-        if fingers == [0, 1, 1, 1, 0] and frame_counter % frame_skip == 0:
+        if fingers == [1, 1, 1, 0, 0] and frame_counter % frame_skip == 0:
             if annotations:
-                annotations.pop(-1)
+                annotations.pop()
                 annotationNumber -= 1
                 annotationStart = False
+                lastDel = True
             
 
     for i in range(len(annotations)):
