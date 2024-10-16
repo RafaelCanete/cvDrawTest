@@ -12,8 +12,8 @@ cvzone
 - source your-venv-name/bin/activate
 3. Install dependencies
 - pip install mediapipe
-- pip install opencv
-- pip install cvzone
+- pip install opencv-python
+- pip install cvzon
 4. Run main.py
 - python3 main.py
 
